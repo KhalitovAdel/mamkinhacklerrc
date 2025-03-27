@@ -1,11 +1,14 @@
 # audio_processor.py
 import time
+from typing import Literal
 import wave
+import sys
 from vad_processor import VADProcessor
 
 class AudioProcessor:
-    def __init__(self, sample_rate=16000, channels=1):
+    def __init__(self, sample_rate=16000, channels=1, min_speach_size=10 * 1024):
         self.vad_processor = VADProcessor(sample_rate, channels)
+        self.__min_speach_size = min_speach_size
     
     def monitor_audio_file(self, filename):
         """Monitor WAV file for new audio chunks"""
@@ -19,13 +22,12 @@ class AudioProcessor:
                     continue
                 
                 result = self.vad_processor.process_audio_chunk(chunk)
-                self.__handle_vad_result(result)
+
+                if result:
+                    self.__handle_vad_result(result)
     
-    def __handle_vad_result(self, result):
+    def __handle_vad_result(self, result: tuple[Literal['end'], bytes] | Literal['start']):
         """Handle VAD processor output"""
-        if not result:
-            return
-        
         if result == "start":
             print("Speech started - handle accordingly")
             # Do something when speech starts
@@ -34,12 +36,13 @@ class AudioProcessor:
             print("Speech ended - saving audio chunk")
             self.__save_audio_chunk(result[1])
     
-    def __save_audio_chunk(self, audio_data):
+    def __save_audio_chunk(self, audio_data: bytes):
         """Save audio chunk to file"""
-        filename = f"speech_{int(time.time())}.wav"
-        with wave.open(filename, "wb") as wf:
-            wf.setnchannels(1)
-            wf.setsampwidth(2)
-            wf.setframerate(self.vad_processor.SAMPLE_RATE)
-            wf.writeframes(audio_data)
-        print(f"Saved: {filename}")
+        if sys.getsizeof(audio_data) > self.__min_speach_size: 
+            filename = f"speech_{int(time.time())}.wav"
+            with wave.open(filename, "wb") as wf:
+                wf.setnchannels(1)
+                wf.setsampwidth(2)
+                wf.setframerate(self.vad_processor.SAMPLE_RATE)
+                wf.writeframes(audio_data)
+            print(f"Saved: {filename}")

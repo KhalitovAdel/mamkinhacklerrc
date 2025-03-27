@@ -1,4 +1,5 @@
 # vad_processor.py
+from typing import Literal
 import webrtcvad
 import struct
 import numpy as np
@@ -21,7 +22,7 @@ class VADProcessor:
         self.noise_level = None
         self.speech_counter = 0
 
-    def process_audio_chunk(self, chunk):
+    def process_audio_chunk(self, chunk) -> (tuple[Literal['end'], bytes] | Literal['start'] | None):
         """Process audio chunk with noise adaptation"""
         # Конвертация в моно
         if self.CHANNELS == 2:
