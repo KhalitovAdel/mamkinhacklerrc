@@ -4,7 +4,6 @@ import time
 from audio_processor import AudioProcessor
 
 class Recorder: 
-    @staticmethod
     class Record:
         def __init__(self, process):
             self.process = process
