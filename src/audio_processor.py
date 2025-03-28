@@ -1,14 +1,17 @@
 # audio_processor.py
+import sys
 import time
 from typing import Literal
-import wave
-import sys
+
+from speach_handler import SpeachHandler
 from vad_processor import VADProcessor
 
+
 class AudioProcessor:
-    def __init__(self, sample_rate=16000, channels=1, min_speach_size=10 * 1024):
+    def __init__(self, speach_handler: SpeachHandler, sample_rate=16000, channels=1, min_speach_size=10 * 1024):
         self.vad_processor = VADProcessor(sample_rate, channels)
         self.__min_speach_size = min_speach_size
+        self.__speach_handler = speach_handler
     
     def monitor_audio_file(self, filename):
         """Monitor WAV file for new audio chunks"""
@@ -38,11 +41,5 @@ class AudioProcessor:
     
     def __save_audio_chunk(self, audio_data: bytes):
         """Save audio chunk to file"""
-        if sys.getsizeof(audio_data) > self.__min_speach_size: 
-            filename = f"speech_{int(time.time())}.wav"
-            with wave.open(filename, "wb") as wf:
-                wf.setnchannels(1)
-                wf.setsampwidth(2)
-                wf.setframerate(self.vad_processor.SAMPLE_RATE)
-                wf.writeframes(audio_data)
-            print(f"Saved: {filename}")
+        if sys.getsizeof(audio_data) > self.__min_speach_size:
+            self.__speach_handler.translate_to_text_process(audio_data)

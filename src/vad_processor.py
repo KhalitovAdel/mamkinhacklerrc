@@ -62,7 +62,26 @@ class VADProcessor:
                     self.speech_counter = 0
                     audio_data = b"".join(self.audio_buffer)
                     self.audio_buffer.clear()
-                    return "end", audio_data
+
+                    data_size = len(audio_data)
+                    header = struct.pack(
+                        '<4sI4s4sIHHIIHH4sI',
+                        b'RIFF',
+                        36 + data_size,
+                        b'WAVE',
+                        b'fmt ',
+                        16,  # fmt chunk size
+                        1,  # audio format (PCM)
+                        self.CHANNELS,
+                        self.SAMPLE_RATE,
+                        self.SAMPLE_RATE * self.CHANNELS * 2,  # byte rate
+                        self.CHANNELS * 2,  # block align
+                        16,  # bits per sample
+                        b'data',
+                        data_size
+                    )
+                    
+                    return "end", header + audio_data
         
         return None
 

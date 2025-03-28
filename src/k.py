@@ -1,7 +1,12 @@
 import subprocess
-from pynput import keyboard
 import time
+
+from pynput import keyboard
+
 from audio_processor import AudioProcessor
+from config_provider import ConfigProvider
+from speach_handler import SpeachHandler
+
 
 class Recorder: 
     class Record:
@@ -67,7 +72,9 @@ if __name__ == "__main__":
                 record = instance.record_system_audio()
                 print("🛑  Нажмите F1 для остановки. Для выхода нажмите Ctrl+C")
                 time.sleep(1)
-                processor = AudioProcessor(sample_rate=16000, channels=1)
+                config_provider = ConfigProvider()
+                speech_handler = SpeachHandler(config_provider)
+                processor = AudioProcessor(sample_rate=16000, channels=1, speach_handler=speech_handler)
                 processor.monitor_audio_file("output.wav")
             else:
                 record.stop()
