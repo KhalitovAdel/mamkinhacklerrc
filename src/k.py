@@ -5,6 +5,7 @@ from pynput import keyboard
 
 from audio_processor import AudioProcessor
 from config_provider import ConfigProvider
+from promt_processor import PromptProcessor
 from speach_handler import SpeachHandler
 
 
@@ -73,7 +74,8 @@ if __name__ == "__main__":
                 print("🛑  Нажмите F1 для остановки. Для выхода нажмите Ctrl+C")
                 time.sleep(1)
                 config_provider = ConfigProvider()
-                speech_handler = SpeachHandler(config_provider)
+                prompt_processor = PromptProcessor(config_provider)
+                speech_handler = SpeachHandler(config_provider, prompt_processor)
                 processor = AudioProcessor(sample_rate=16000, channels=1, speach_handler=speech_handler)
                 processor.monitor_audio_file("output.wav")
             else:

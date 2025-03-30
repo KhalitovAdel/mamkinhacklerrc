@@ -4,16 +4,16 @@ from speechkit import configure_credentials, creds, model_repository
 from speechkit.stt import AudioProcessingType
 
 from config_provider import ConfigProvider
+from promt_processor import PromptProcessor
 
 
 class SpeachHandler:
-    def __init__(self, configProvider: ConfigProvider):
+    def __init__(self, configProvider: ConfigProvider, promptProcessor: PromptProcessor):
         self.__audio_track_queue = queue.Queue()
-        token = configProvider.get_required_property("yandex.speechkit.token")
-        
+        self.__prompt_processor = promptProcessor
         configure_credentials(
             yandex_credentials=creds.YandexCredentials(
-                api_key=token
+                api_key=configProvider.get_required_property("yandex.speechkit.token")
             )
         )
 
@@ -30,4 +30,5 @@ class SpeachHandler:
         while not self.__audio_track_queue.empty():
             audio_track = self.__audio_track_queue.get()
             text = self.__model.transcribe(audio=audio_track)
-            print(text)
+            if text[0]:
+                self.__prompt_processor.exec(text[0].raw_text)
