@@ -1,5 +1,7 @@
 import requests
 from config_provider import ConfigProvider
+from rich.console import Console
+from rich.markdown import Markdown
 
 class PromptProcessor:
     __dialog_context = [
@@ -16,6 +18,8 @@ class PromptProcessor:
             """
         }
     ]
+
+    __console = Console()
 
     def __init__(self, config_provider: ConfigProvider):
         self.__config_provider = config_provider
@@ -40,9 +44,11 @@ class PromptProcessor:
         response = requests.post('https://llm.api.cloud.yandex.net/foundationModels/v1/completion', json=data, headers=headers)
 
         response_text = response.json()["result"]["alternatives"][0]["message"]["text"]
-        print(f"dialog_text = {dialog_text}")
-        print(f"response_text = {response_text}")
-        print(f"response = {response.json()}")
         self.__dialog_context.append({ 'role': 'assistant', 'text': response_text })
-        print(response_text)
+        
+        print("_______________________ Вопрос: ")
+        print(dialog_text)
+        print("_______________________")
+
+        self.__console.print(Markdown(response_text))
 

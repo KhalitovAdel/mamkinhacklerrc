@@ -44,7 +44,7 @@ class VADProcessor:
             self.silence_frames = 0
             
             if not self.is_speaking and self.speech_counter > 2:
-                print("🔊 Speech started!")
+                # print("🔊 Speech started!")
                 self.is_speaking = True
                 return "start"
         else:
@@ -57,7 +57,7 @@ class VADProcessor:
                     dynamic_threshold += 10
                 
                 if self.silence_frames >= dynamic_threshold:
-                    print(f"🔇 Speech ended! (Noise level: {self.noise_level:.1f})")
+                    # print(f"🔇 Speech ended! (Noise level: {self.noise_level:.1f})")
                     self.is_speaking = False
                     self.speech_counter = 0
                     audio_data = b"".join(self.audio_buffer)

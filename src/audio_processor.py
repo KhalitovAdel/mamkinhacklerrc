@@ -31,12 +31,8 @@ class AudioProcessor:
     
     def __handle_vad_result(self, result: tuple[Literal['end'], bytes] | Literal['start']):
         """Handle VAD processor output"""
-        if result == "start":
-            print("Speech started - handle accordingly")
-            # Do something when speech starts
-        
-        elif isinstance(result, tuple) and result[0] == "end":
-            print("Speech ended - saving audio chunk")
+        if isinstance(result, tuple) and result[0] == "end":
+            # print("Speech ended - saving audio chunk")
             self.__save_audio_chunk(result[1])
     
     def __save_audio_chunk(self, audio_data: bytes):
